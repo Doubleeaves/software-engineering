@@ -52,10 +52,54 @@ def readFile(filePath: str) -> str:
     return lines
 
 
+def searchIfElse(data: list) -> None:
+    stack = Stack()
+    index = 0
+    while index < len(data):
+        if data[index] == 'if':
+            stack.pop()
+    return None
+
+
+def searchSwitch(data: list[str],
+                 caseNum: list,
+                 switcTimes: int = 0,
+                 status=False) -> int:
+    index = 0
+    stack = Stack()
+    num = 0
+    flag = False
+    while index < len(data):
+        if data[index] == 'switch' and flag is False:
+            flag = True
+            switcTimes += 1
+        elif data[index] == 'case' and flag is True:
+            num += 1
+        elif data[index] == '{' and flag is True:
+            stack.push('{')
+        elif data[index] == '}' and flag is True:
+            stack.pop()
+            if len(stack) == 0:
+                caseNum.append(str(switcTimes) + ' ' + str(num))
+                num = 0
+                flag = False
+                switcTimes += 1
+                if status is True:
+                    return index
+                else:
+                    switcTimes += 1
+        elif data[index] == 'switch' and flag is True:
+            index = searchSwitch(data[index:], caseNum, switcTimes,
+                                 True) + index
+        index += 1
+    caseNum.sort()
+    return index
+
+
 if __name__ == '__main__':
     # filePath = sys.argv[1]
     start = time.time()
-    string = readFile("C://vscode//.vscode//1.cpp")
+    string = readFile("C://vscode//.vscode//plane.cpp")
     string = re.sub(r'\".*\"', '', string)
     string = re.sub(r"//.*", '', string)
     string = string.replace('\n', '')
@@ -83,4 +127,7 @@ if __name__ == '__main__':
             break
     # print(key_dic)
     print(num)
+    caseNum = []
+    searchSwitch(string, caseNum)
+    print(caseNum)
     print(time.time() - start)
