@@ -29,6 +29,9 @@ class Stack():
     def __len__(self):
         return len(self.__buffer)
 
+    def top(self) -> Any:
+        return self.__buffer[len(self.__buffer) - 1]
+
 
 class Queue():
     def __init__(self) -> None:
@@ -44,16 +47,48 @@ class Queue():
         return len(self.__buffer)
 
 
-def readFile(filePath: str) -> str:
+def readFile(filePath: str) -> list[str]:
     lines = ""
     with open(filePath) as file:
         for line in file:
+            line.encode('utf-8')
             lines = lines + line
+    lines = re.sub(r'\".*\"', '', lines)
+    lines = re.sub(r"//.*", '', lines)
+    lines = lines.replace('\n', '')
+    lines = re.sub(r'/\*.*?\*/', '', lines)
+    for i in BRACKETS:
+        lines = lines.replace(i, ' ' + i + ' ')
     return lines
 
 
-def searchIfElse(data: list) -> None:
-    return None
+def searchIfElse(data: list[str], ifDic: dict, status=False, rightBrackets=Stack()) -> int:
+    index = len(data) - 1
+    flag = False
+    ifType = 0
+    stackCount = 0
+    while index >= 0:
+        if data[index] == 'else':
+            if flag is False:
+                flag = True
+                stackCount = len(rightBrackets)
+            else:
+                index = searchIfElse(data[:index+1], ifDic, True, rightBrackets)
+        elif data[index] == 'if':
+            if flag is True and len(rightBrackets) == stackCount:
+                ifDic[ifType] += 1
+                flag = False
+                if status is True:
+                    return index
+            ifType = 0
+        elif data[index] == 'elif' and flag is True:
+            ifType = 1
+        elif data[index] == '{':
+            rightBrackets.pop()
+        elif data[index] == '}':
+            rightBrackets.push('{')
+        index -= 1
+    return 0
 
 
 def searchSwitch(data: list[str],
@@ -95,34 +130,38 @@ if __name__ == '__main__':
     # filePath = sys.argv[1]
     start = time.time()
     string = readFile("C://vscode//.vscode//plane.cpp")
-    string = re.sub(r'\".*\"', '', string)
-    string = re.sub(r"//.*", '', string)
-    string = string.replace('\n', '')
-    string = re.sub(r'/\*.*\*/', '', string)
-    # print(string)
     for i in BRACKETS:
         string = string.replace(i, ' ' + i + ' ')
-    # print(string)
-    key_dic = {}
+    keyDic = {}
     for i in KEY_WORD:
-        key_dic[i] = 0
+        keyDic[i] = 0
     string = string.split(' ')
-    for i in string:
-        try:
-            key_dic[i] += 1
-        except Exception:
-            continue
-    num = 0
-    for value in key_dic.values():
-        num += value
     while True:
         try:
             string.remove('')
         except Exception:
             break
-    print(key_dic)
+    index = -1
+    while index < len(string):
+        index += 1
+        try:
+            keyDic[string[index]] += 1
+            if string[index] == 'if':
+                if string[index-1] == 'else':
+                    string[index] = 'elif'
+                    string.pop(index-1)
+                    index -= 1
+        except Exception:
+            continue
+    num = 0
+    for value in keyDic.values():
+        num += value
+    print(string)
     print(num)
     caseNum = []
+    ifDic = {0: 0, 1: 0}
     searchSwitch(string, caseNum)
     print(caseNum)
+    searchIfElse(string, ifDic)
+    print(ifDic)
     print(time.time() - start)
