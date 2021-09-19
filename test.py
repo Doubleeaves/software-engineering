@@ -6,7 +6,7 @@ from typing import Any
 KEY_WORD = [
     "auto", "double", "int", "struct", "break", "else", "long", "switch",
     "case", "enum", "register", "typedef", "char", "extern", "return", "union",
-    "const", "float", "short", "unsigned", "continue", "for", "signed", "void"
+    "const", "float", "short", "unsigned", "continue", "for", "signed", "void",
     "default", "goto", "sizeof", "volatile", "do", "if", "while", "static"
 ]
 
@@ -53,11 +53,6 @@ def readFile(filePath: str) -> str:
 
 
 def searchIfElse(data: list) -> None:
-    stack = Stack()
-    index = 0
-    while index < len(data):
-        if data[index] == 'if':
-            stack.pop()
     return None
 
 
@@ -125,7 +120,7 @@ if __name__ == '__main__':
             string.remove('')
         except Exception:
             break
-    # print(key_dic)
+    print(key_dic)
     print(num)
     caseNum = []
     searchSwitch(string, caseNum)
