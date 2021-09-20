@@ -39,12 +39,13 @@ class Stack():
 
 def readFile(filePath: str) -> list[str]:  # 读取文件内容
     lines = ""
-    with open(filePath, encoding='utf-8') as file:  # 逐行读取
+    with open(filePath, 'r', encoding='utf-8', errors='ignore') as file:  # 逐行读取
         for line in file:
             lines = lines + line
     lines = re.sub(r'\".*\"', '', lines)  # 正则匹配，将所有字符串删除
     lines = re.sub(r"//.*", '', lines)  # 正则匹配，将所有以 // 注释的内容删除
     lines = lines.replace('\n', '')  # 删除所有换行符
+    lines = lines.replace('\t', '')
     lines = re.sub(r'/\*.*?\*/', '',
                    lines)  # 正则删除所有以 /**/注释的内容删除，采用非贪婪匹配，防止删除过多
     for i in BRACKETS:
@@ -164,13 +165,14 @@ def searchKeyWords(data: list[str]) -> int:  # 暴力遍历所有单词
 
 
 if __name__ == '__main__':
-    path = "C://vscode//.vscode//plane.cpp"
+    path = "D://QQ//QQfile//2389488343//FileRecv//11.cpp"
     level = 4
     if len(sys.argv) == 3:
         path = sys.argv[1]
         level = int(sys.argv[2])
     start = time.time()
     string = readFile(path)
+    print(string)
     if level >= 1:
         num = searchKeyWords(string)
         print('total num: ' + str(num))
