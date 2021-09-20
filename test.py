@@ -1,5 +1,5 @@
 # -*-coding:utf-8-*-
-# import sys
+import sys
 import time
 import re
 from typing import Any
@@ -45,10 +45,19 @@ def readFile(filePath: str) -> list[str]:
     lines = re.sub(r'/\*.*?\*/', '', lines)
     for i in BRACKETS:
         lines = lines.replace(i, ' ' + i + ' ')
+    lines = lines.split(' ')
+    while True:
+        try:
+            lines.remove('')
+        except Exception:
+            break
     return lines
 
 
-def searchIfElse(data: list[str], ifDic: dict, status=False, rightBrackets=Stack()) -> int:
+def searchIfElse(data: list[str],
+                 ifDic: dict,
+                 status=False,
+                 rightBrackets=Stack()) -> int:
     index = len(data) - 1
     flag = False
     ifType = 0
@@ -59,7 +68,8 @@ def searchIfElse(data: list[str], ifDic: dict, status=False, rightBrackets=Stack
                 flag = True
                 stackCount = len(rightBrackets)
             else:
-                index = searchIfElse(data[:index+1], ifDic, True, rightBrackets)
+                index = searchIfElse(data[:index + 1], ifDic, True,
+                                     rightBrackets)
         elif data[index] == 'if':
             if flag is True and len(rightBrackets) == stackCount:
                 ifDic[ifType] += 1
@@ -112,46 +122,51 @@ def searchSwitch(data: list[str],
     return index
 
 
-if __name__ == '__main__':
-    # filePath = sys.argv[1]
-    start = time.time()
-    string = readFile("C://vscode//.vscode//1.cpp")
-    for i in BRACKETS:
-        string = string.replace(i, ' ' + i + ' ')
-    keyDic = {}
-    for i in KEY_WORD:
-        keyDic[i] = 0
-    string = string.split(' ')
-    while True:
-        try:
-            string.remove('')
-        except Exception:
-            break
+def searchKeyWords(data: list[str]) -> int:
     index = -1
-    while index < len(string):
+    while index < len(data):
         index += 1
         try:
-            keyDic[string[index]] += 1
-            if string[index] == 'if':
-                if string[index-1] == 'else':
-                    string[index] = 'elif'
-                    string.pop(index-1)
+            keyDic[data[index]] += 1
+            if data[index] == 'if':
+                if data[index - 1] == 'else':
+                    data[index] = 'elif'
+                    data.pop(index - 1)
                     index -= 1
         except Exception:
             continue
     num = 0
     for value in keyDic.values():
         num += value
-    print('total num: ' + str(num))
-    caseNum = []
-    ifDic = {0: 0, 1: 0}
-    searchSwitch(string, caseNum)
-    print('switch num: ' + str(len(caseNum)))
-    print('case num: ', end='')
-    for i in caseNum:
-        print(i[2:], end=' ')
-    print()
-    searchIfElse(string, ifDic)
-    print('if-else num: ' + str(ifDic[0]))
-    print('if-elseif-else num: ' + str(ifDic[1]))
+    return num
+
+
+if __name__ == '__main__':
+    path = "C://vscode//.vscode//plane.cpp"
+    level = 1
+    if len(sys.argv) == 3:
+        path = sys.argv[1]
+        level = int(sys.argv[2])
+    start = time.time()
+    string = readFile(path)
+    keyDic = {}
+    for i in KEY_WORD:
+        keyDic[i] = 0
+    if level >= 1:
+        num = searchKeyWords(string)
+        print('total num: ' + str(num))
+    if level >= 2:
+        caseNum = []
+        searchSwitch(string, caseNum)
+        print('switch num: ' + str(len(caseNum)))
+        print('case num: ', end='')
+        for i in caseNum:
+            print(i[2:], end=' ')
+        print()
+    if level > 2:
+        ifDic = {0: 0, 1: 0}
+        searchIfElse(string, ifDic)
+        if level >= 3:
+            print('if-else num: ' + str(ifDic[0]))
+        print('if-elseif-else num: ' + str(ifDic[1]))
     print(time.time() - start)
