@@ -165,14 +165,13 @@ def searchKeyWords(data: list[str]) -> int:  # 暴力遍历所有单词
 
 
 if __name__ == '__main__':
-    path = "D://QQ//QQfile//2389488343//FileRecv//11.cpp"
+    path = "./1.cpp"
     level = 4
     if len(sys.argv) == 3:
         path = sys.argv[1]
         level = int(sys.argv[2])
     start = time.time()
     string = readFile(path)
-    print(string)
     if level >= 1:
         num = searchKeyWords(string)
         print('total num: ' + str(num))
