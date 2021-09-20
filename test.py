@@ -3,6 +3,8 @@ import sys
 import time
 import re
 from typing import Any
+import psutil
+import os
 # 一个装有给定关键字的常量列表
 KEY_WORD = [
     "auto", "double", "int", "struct", "break", "else", "long", "switch",
@@ -188,3 +190,4 @@ if __name__ == '__main__':
         if level >= 4:
             print('if-elseif-else num: ' + str(ifDic[1]))
     print('total time is: ' + str(time.time() - start) + 'ms')
+    print('using %.4f MB' % (psutil.Process(os.getpid()).memory_info().rss / 1024 / 1024))
