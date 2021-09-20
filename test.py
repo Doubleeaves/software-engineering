@@ -33,20 +33,6 @@ class Stack():
         return self.__buffer[len(self.__buffer) - 1]
 
 
-class Queue():
-    def __init__(self) -> None:
-        self.__buffer = []
-
-    def pop(self) -> Any:
-        self.__buffer.pop(0)
-
-    def push(self, elemt) -> Any:
-        self.__buffer.append(elemt)
-
-    def __len__(self):
-        return len(self.__buffer)
-
-
 def readFile(filePath: str) -> list[str]:
     lines = ""
     with open(filePath) as file:
@@ -129,7 +115,7 @@ def searchSwitch(data: list[str],
 if __name__ == '__main__':
     # filePath = sys.argv[1]
     start = time.time()
-    string = readFile("C://vscode//.vscode//plane.cpp")
+    string = readFile("C://vscode//.vscode//1.cpp")
     for i in BRACKETS:
         string = string.replace(i, ' ' + i + ' ')
     keyDic = {}
@@ -156,12 +142,16 @@ if __name__ == '__main__':
     num = 0
     for value in keyDic.values():
         num += value
-    print(string)
-    print(num)
+    print('total num: ' + str(num))
     caseNum = []
     ifDic = {0: 0, 1: 0}
     searchSwitch(string, caseNum)
-    print(caseNum)
+    print('switch num: ' + str(len(caseNum)))
+    print('case num: ', end='')
+    for i in caseNum:
+        print(i[2:], end=' ')
+    print()
     searchIfElse(string, ifDic)
-    print(ifDic)
+    print('if-else num: ' + str(ifDic[0]))
+    print('if-elseif-else num: ' + str(ifDic[1]))
     print(time.time() - start)
