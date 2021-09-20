@@ -56,12 +56,16 @@ def readFile(filePath: str) -> list[str]:  # 读取文件内容
     return lines
 
 
+# 查找if - else和if-elif-else结构的数量，采用花括号匹配逆序遍历
+# data为传入需要查找的字符串列表，ifDic为计数两种if-else情况的字典
+# status为True时，函数处于递归态，rightBrackets为存储'}'的栈
+# 结果通过ifDic来展示
 def searchIfElse(
     data: list[str],
     ifDic: dict,
     status=False,
     rightBrackets=Stack()
-) -> int:  # 查找if - else和if-elif-else结构的数量，采用花括号匹配逆序遍历
+) -> int:
     index = len(data) - 1  # 从尾端开始遍历
     flag = False  # 设置标志，True为遇到else，False为未遇到else
     ifType = 0  # 1为if-elif-else格式 0为if-else格式
@@ -93,20 +97,22 @@ def searchIfElse(
     return 0
 
 
+# 查找switch-case的数量，正序括号匹配遍历,data为传入的匹配列表，caseNum为统计case的列表
+# status为True时函数处于递归态，switchTimes为统计switch出现的次数，函数结果由caseNum列表体现
 def searchSwitch(data: list[str],
                  caseNum: list,
                  switcTimes: int = 0,
-                 status=False) -> int:  # 查找switch-case的数量，正序括号匹配遍历
+                 status=False) -> int:
     index = 0
     stack = Stack()
     num = 0
-    flag = False  # 标志位，判断是否遇到switch False 为未遇到或已经匹配，True为遇到
+    flag = False  # 标志位，判断是否遇到switch False 为未遇到switch或已经匹配，True为遇到switch
     while index < len(data):
         if data[index] == 'switch':
             if flag is False:
                 flag = True
                 switcTimes += 1  # 记录碰到switch的次数
-            else:   # 出现套娃，递归处理
+            else:  # 出现套娃，递归处理
                 index = searchSwitch(data[index:], caseNum, switcTimes,
                                      True) + index
         elif data[index] == 'case' and flag is True:
@@ -115,7 +121,7 @@ def searchSwitch(data: list[str],
             stack.push('{')
         elif data[index] == '}' and flag is True:
             stack.pop()
-            if len(stack) == 0:     # 为空栈，则一个switch内容结束，记录数值
+            if len(stack) == 0:  # 为空栈，则一个switch内容结束，记录数值
                 caseNum.append(str(switcTimes) + ' ' + str(num))
                 num = 0
                 flag = False
@@ -126,6 +132,10 @@ def searchSwitch(data: list[str],
                     switcTimes += 1
         index += 1
     caseNum.sort()
+    index = 0
+    while index < len(caseNum):
+        caseNum[index] = caseNum[index][2:]
+        index += 1
     return index
 
 
@@ -168,7 +178,7 @@ if __name__ == '__main__':
         print('switch num: ' + str(len(caseNum)))
         print('case num: ', end='')
         for i in caseNum:
-            print(i[2:], end=' ')
+            print(i, end=' ')
         print()
     if level > 2:
         ifDic = {0: 0, 1: 0}
